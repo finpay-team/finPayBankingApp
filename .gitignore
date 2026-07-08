@@ -1,0 +1,13 @@
+# IntelliJ IDE files
+.idea/
+*.iml
+*.iws
+
+# Maven/Spring Boot build folders (compiled code)
+target/
+*.jar
+*.war
+
+# OS generated files
+.DS_Store
+Thumbs.db

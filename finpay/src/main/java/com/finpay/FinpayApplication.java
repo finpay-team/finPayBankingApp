@@ -1,4 +1,4 @@
-package com.finpay.finpay;
+package com.finpay;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

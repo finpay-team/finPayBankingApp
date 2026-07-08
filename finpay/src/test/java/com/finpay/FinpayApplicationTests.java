@@ -1,4 +1,4 @@
-package com.finpay.finpay;
+package com.finpay;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
