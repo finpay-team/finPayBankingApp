@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXIST user_roles(
+    usr_uid UUID NOT NULL REFERANCES users(usr_uid) ON DELETE CASCADE,
+    rol_uid UUID NOT NULL REFERANCES rolse(rol_uid) ON DELETE CASCADE
+)
