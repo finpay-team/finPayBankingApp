@@ -1,13 +1,15 @@
 package com.finpay.entity;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Builder;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Getter
+@Setter
+@Builder
 @Table(name = "users", schema = "auth")
 public class User {
     @Id
@@ -43,7 +45,7 @@ public class User {
     private UUID createdByUserUid;
 
     @Column(name = "crte_time", updatable = false)
-    private UUID updatedByUserUid;
+    private LocalDateTime updatedByUserUid;
 
     @Column(name = "upd_time")
     private LocalDateTime updatedTime = LocalDateTime.now();
