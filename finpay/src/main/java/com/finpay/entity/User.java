@@ -20,7 +20,7 @@ public class User {
     @Column(name = "usr_eml", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "usr_hwd_hsh", nullable = false)
+    @Column(name = "usr_pwd_hsh", nullable = false)
     private String passwordHash;
 
     @Column(name = "usr_fst_name", nullable = false)
