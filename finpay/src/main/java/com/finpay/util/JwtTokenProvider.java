@@ -25,7 +25,7 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration-milliseconds}")
     private long jwtExpirationDate;
 
-    @Value("${app.jwt.referesh-expiration-milliseconds}")
+    @Value("${app.jwt.refresh-expiration-milliseconds}")
     private long jwtRefreshExpirationDate;
 
 
