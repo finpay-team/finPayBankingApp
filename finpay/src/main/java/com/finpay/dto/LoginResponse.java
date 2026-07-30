@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 public class LoginResponse {
     private String accessToken;
-    private String refereshToken;
+    private String refreshToken;
     @Builder.Default
     private String tokenType = "Bearer";
     private UUID userId;

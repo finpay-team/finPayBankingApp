@@ -75,7 +75,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateRefereshToken(String email, UUID userId){
+    public String generateRefreshToken(String email, UUID userId){
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + jwtRefreshExpirationDate);
 
