@@ -53,4 +53,21 @@ public class UserServiceImpl implements UserService {
                 savedUser.isActive()
         );
     }
+
+    @Override
+    public UserResponse getCurrentUser(String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .isActive(user.isActive())
+                .build();
+
+
+
+    }
 }

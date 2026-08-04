@@ -6,4 +6,6 @@ import com.finpay.dto.UserResponse;
 public interface UserService {
 
     UserResponse registerUser(UserRegistrationRequest request);
+
+    UserResponse getCurrentUser(String email);
 }
