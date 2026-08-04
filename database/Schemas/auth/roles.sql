@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS roles(
+    rol_uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    rol_name VARCHAR(50) UNIQUE NOT NULL,
+    rol_desc VARCHAR(225),
+
+    crte_usr_uid UUID,
+    crte_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    upd_usr_uid UUID,
+    upd_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS refresh_tokens(
+    rtk_uuid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    usr_uid UUID NOT NULL PREFERENCES users(usr_uid) ON DELETE CASCADE,
+    rtk_tkn VARCHAR(225) UNIQUE NOT NULL,
+
+    rtk_exp_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    rtk_tvk_flg BOOLEAN DEFAULT FALSE NOT NULL,
+
+    crte_usr_uid UUID REFERENCES users(usr_uid),
+    crte_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    upd_usr_uid UUID REFERENCES users(usr_uid),
+    upd_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+)
