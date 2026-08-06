@@ -82,7 +82,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(email)
                 .claim("userId", userId.toString())
-                .claim("tokenType", "REFERESH")
+                .claim("tokenType", "REFRESH")
                 .issuedAt(currentDate)
                 .expiration(expireDate)
                 .signWith(key())

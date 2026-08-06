@@ -1,18 +1,28 @@
 package com.finpay.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Data
+@Table(name = "roles", schema = "auth")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "roles", schema = "auth")
+@Builder
 public class Role {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "rol_uid", updatable = false, nullable = false)
@@ -27,12 +37,18 @@ public class Role {
     @Column(name = "crte_usr_uid")
     private UUID createdByUserUid;
 
+    @CreationTimestamp
     @Column(name = "crte_time", updatable = false)
-    private LocalDateTime createdTime = LocalDateTime.now();
+    private LocalDateTime createdTime;
 
     @Column(name = "upd_usr_uid")
     private UUID updatedByUserUid;
 
+    @UpdateTimestamp
     @Column(name = "upd_time")
-    private LocalDateTime updatedTime = LocalDateTime.now();
+    private LocalDateTime updatedTime;
+
+    @ManyToMany(mappedBy = "roles")
+    @Builder.Default
+    private Set<User> users = new HashSet<>();
 }

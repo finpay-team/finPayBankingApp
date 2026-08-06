@@ -2,21 +2,27 @@ package com.finpay.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users", schema = "auth")
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "usr_uid", updatable = false, nullable = false)
-    UUID id;
+    private UUID id;
 
     @Column(name = "usr_eml", unique = true, nullable = false)
     private String email;
@@ -45,9 +51,34 @@ public class User {
     @Column(name = "crte_usr_uid")
     private UUID createdByUserUid;
 
+    @CreationTimestamp
     @Column(name = "crte_time", updatable = false)
-    private LocalDateTime updatedByUserUid;
+    private LocalDateTime createdTime;
 
+    @Column(name = "upd_usr_uid")
+    private UUID updatedByUserUid;
+
+    @UpdateTimestamp
     @Column(name = "upd_time")
-    private LocalDateTime updatedTime = LocalDateTime.now();
+    private LocalDateTime updatedTime;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            schema = "auth",
+            joinColumns = @JoinColumn(name = "usr_uid"),
+            inverseJoinColumns = @JoinColumn(name = "rol_uid")
+    )
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role) {
+        this.roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    public void removeRole(Role role) {
+        this.roles.remove(role);
+        role.getUsers().remove(this);
+    }
 }
