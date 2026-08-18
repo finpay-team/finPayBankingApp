@@ -77,6 +77,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid or expired refresh token");
         }
 
+        RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found or revoked"));
+
+        if (existingRefreshToken.getExpiryDate().isBefore(Instant.now())) {
+            refreshTokenRepository.delete(existingRefreshToken);
+            throw new RuntimeException("Refresh token has expired");
+        }
+        
         String tokenType = jwtTokenProvider.getTokenType(token);
         if(!"REFRESH".equals(tokenType)){
             throw new RuntimeException("Invalid token type. Expected Refresh token.");

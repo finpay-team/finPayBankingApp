@@ -4,6 +4,7 @@ import com.finpay.dto.ApiResponse;
 import com.finpay.dto.UserRegistrationRequest;
 import com.finpay.dto.UserResponse;
 import com.finpay.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UserResponse>> registerUesr(@RequestBody UserRegistrationRequest request){
+    public ResponseEntity<ApiResponse<UserResponse>> registerUesr(@Valid @RequestBody UserRegistrationRequest request){
 
         UserResponse createdUser = userService.registerUser(request);
 
