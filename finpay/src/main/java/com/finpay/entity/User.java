@@ -44,9 +44,13 @@ public class User {
 
     @Column(name = "crte_usr_uid")
     private UUID createdByUserUid;
+/*
 
     @Column(name = "crte_time", updatable = false)
     private LocalDateTime updatedByUserUid;
+*/
+    @Column(name = "crte_time", updatable = false, nullable = false)
+    private LocalDateTime createdTime;
 
     @Column(name = "upd_time")
     private LocalDateTime updatedTime = LocalDateTime.now();
