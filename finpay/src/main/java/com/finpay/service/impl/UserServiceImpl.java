@@ -5,6 +5,7 @@ import com.finpay.dto.UserResponse;
 import com.finpay.entity.Role;
 import com.finpay.entity.User;
 import com.finpay.exception.BadRequestException;
+import com.finpay.exception.ResourceNotFoundException;
 import com.finpay.repository.RoleRepository;
 import com.finpay.repository.UserRepository;
 import com.finpay.service.UserService;
@@ -57,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getCurrentUser(String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return UserResponse.builder()
                 .id(user.getId())

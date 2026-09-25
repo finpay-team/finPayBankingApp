@@ -69,7 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/users/register").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         // Allow Swagger UI
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/test-ui.html").permitAll()
                         // Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 );
