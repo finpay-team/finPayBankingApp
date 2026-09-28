@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinPay — API Test UI</title>
+    <style>
+        body { font-family: "Segoe UI", Arial, sans-serif; max-width: 760px; margin: 20px auto; padding: 0 12px; background: #f5f7fa; color: #222; }
+        h1 { font-size: 22px; } h2 { font-size: 16px; margin: 4px 0 10px; }
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        input { width: 100%; padding: 8px; margin: 4px 0 10px; box-sizing: border-box; border: 1px solid #bbb; border-radius: 4px; }
+        button { padding: 8px 16px; border: none; border-radius: 4px; background: #1a73e8; color: #fff; cursor: pointer; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        .ok { color: #16a34a; font-weight: bold; } .err { color: #dc2626; font-weight: bold; }
+        .note { font-size: 13px; color: #555; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+<h1>🔐 FinPay — Password Reset Test UI</h1>
+<p class="note">API: <code>http://localhost:8080</code> &nbsp;|&nbsp; Email link mein <code>?token=...</code> ho to token yahan auto-fill ho jata hai.</p>
+
+<div class="card">
+    <h2>1) Register a user</h2>
+    <input id="regEmail" placeholder="Email" value="tester1@gmail.com">
+    <input id="regPass" placeholder="Password (12-25 chars, upper+lower+digit+special)" value="OldPass@1234">
+    <input id="regFirst" placeholder="First name" value="Test">
+    <input id="regLast" placeholder="Last name" value="User">
+    <button onclick="registerUser()">Register</button>
+</div>
+
+<div class="card">
+    <h2>2) Login</h2>
+    <input id="loginEmail" placeholder="Email" value="tester1@gmail.com">
+    <input id="loginPass" placeholder="Password" value="OldPass@1234">
+    <button onclick="login()">Login</button>
+</div>
+
+<div class="card">
+    <h2>3) Forgot Password → email bhejega</h2>
+    <input id="fpEmail" placeholder="Email" value="tester1@gmail.com">
+    <button onclick="forgotPassword()">Send reset link</button>
+    <div id="tokenStatus" class="note">Token is not returned by the API (by design). Get it from the email / or run:
+        SELECT prt_tkn FROM auth.password_reset_tokens; → paste in Step 4.</div>
+</div>
+
+<div class="card">
+    <h2>4) Reset Password</h2>
+    <input id="rpToken" placeholder="Token (auto-filled from ?token= in the link)" disabled>
+    <input id="rpPass" placeholder="New password" value="NewPass@5678">
+    <button onclick="resetPassword()">Reset password</button>
+</div>
+
+<div class="card">
+    <h2>5) Get my profile (needs login first)</h2>
+    <button onclick="getMe()">GET /api/v1/users/me</button>
+</div>
+
+<pre id="output">Output yahan dikhega...</pre>
+
+<script>
+    const BASE = 'http://localhost:8080';
+    const $ = id => document.getElementById(id);
+    let accessToken = null;
+
+    async function call(method, path, body, headers = {}) {
+        const res = await fetch(BASE + path, {
+            method,
+            headers: { 'Content-Type': 'application/json', ...headers },
+            body: body ? JSON.stringify(body) : undefined
+        });
+        return { status: res.status, json: await res.json() };
+    }
+
+    function show(title, result) {
+        const icon = (result.json && result.json.success === true)
+            ? '<span class="ok">✔ ' + result.status + ' OK</span>'
+            : '<span class="err">✘ HTTP ' + result.status + '</span>';
+        $('output').innerHTML = icon + ' — ' + title + '\n\n' + JSON.stringify(result.json, null, 2);
+    }
+
+    async function registerUser() {
+        show('Register', await call('POST', '/api/v1/users/register', {
+            email: $('regEmail').value, password: $('regPass').value,
+            firstName: $('regFirst').value, lastName: $('regLast').value
+        }));
+    }
+
+    async function login() {
+        const r = await call('POST', '/api/v1/auth/login', {
+            email: $('loginEmail').value, password: $('loginPass').value
+        });
+        if (r.json.success && r.json.data.accessToken) {
+            accessToken = r.json.data.accessToken;
+            $('rpToken').disabled = false;
+        }
+        show('Login', r);
+    }
+
+    async function forgotPassword() {
+        show('Forgot password', await call('POST', '/api/v1/auth/forgot-password', {
+            email: $('fpEmail').value
+        }));
+    }
+
+    async function resetPassword() {
+        show('Reset password', await call('POST', '/api/v1/auth/reset-password', {
+            token: $('rpToken').value, newPassword: $('rpPass').value
+        }));
+    }
+
+    async function getMe() {
+        if (!accessToken) { $('output').innerHTML = '<span class="err">Pehle Step 2 (Login) karo.</span>'; return; }
+        show('My profile', await call('GET', '/api/v1/users/me', null, { Authorization: 'Bearer ' + accessToken }));
+    }
+
+    // ⭐ Email link se aate time token auto-fill:  /test-ui.html?token=GMIB...
+    const paramToken = new URLSearchParams(location.search).get('token');
+    if (paramToken) {
+        $('rpToken').value = paramToken;
+        $('rpToken').disabled = false;
+        $('tokenStatus').innerHTML = '<span class="ok">✔ Token email link se auto-filled ho gaya.</span>';
+    }
+</script>
+</body>
+</html>

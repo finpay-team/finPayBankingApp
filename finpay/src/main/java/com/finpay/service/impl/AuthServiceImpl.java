@@ -7,6 +7,9 @@ import com.finpay.dto.RefreshTokenRequest;
 import com.finpay.dto.RefreshTokenResponse;
 import com.finpay.entity.RefreshToken;
 import com.finpay.entity.User;
+import com.finpay.exception.BadRequestException;
+import com.finpay.exception.ResourceNotFoundException;
+import com.finpay.exception.UnauthorizedException;
 import com.finpay.repository.RefreshTokenRepository;
 import com.finpay.repository.UserRepository;
 import com.finpay.service.AuthService;
@@ -36,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private long jwtRefreshExpirationDate;
 
     @Override
+    @Transactional
     public LoginResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -47,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId(), "ROLE_USER");
         String refreshTokenString = jwtTokenProvider.generateRefreshToken(user.getEmail(), user.getId());
@@ -70,33 +74,34 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request){
 
         String token = request.getRefreshToken();
         if(!jwtTokenProvider.validateToken(token)){
-            throw new RuntimeException("Invalid or expired refresh token");
+            throw new UnauthorizedException("Invalid or expired refresh token");
         }
 
         RefreshToken existingRefreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found or revoked"));
+                .orElseThrow(() -> new UnauthorizedException("Refresh token not found or revoked"));
 
         if (existingRefreshToken.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(existingRefreshToken);
-            throw new RuntimeException("Refresh token has expired");
+            throw new UnauthorizedException("Refresh token has expired");
         }
         
         String tokenType = jwtTokenProvider.getTokenType(token);
         if(!"REFRESH".equals(tokenType)){
-            throw new RuntimeException("Invalid token type. Expected Refresh token.");
+            throw new BadRequestException("Invalid token type. Expected Refresh token.");
         }
 
         String email = jwtTokenProvider.getEmailFromToken(token);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!user.isActive() || user.isLocked()) {
-            throw new RuntimeException("User account is disabled or locked");
+            throw new UnauthorizedException("User account is disabled or locked");
         }
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(user.getEmail(), user.getId(), "ROLE_USER");

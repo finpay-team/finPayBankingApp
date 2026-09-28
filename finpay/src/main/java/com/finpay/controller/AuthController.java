@@ -2,6 +2,7 @@ package com.finpay.controller;
 
 import com.finpay.dto.*;
 import com.finpay.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = authService.login(loginRequest);
 
         ApiResponse<LoginResponse> response = new ApiResponse<>(
@@ -25,12 +26,12 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(@RequestBody RefreshTokenRequest request){
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request){
         RefreshTokenResponse tokenResponse = authService.refreshToken(request);
 
         ApiResponse<RefreshTokenResponse> response = new ApiResponse<>(
                 true,
-                "Token refreshed succcessfully",
+                "Token refreshed successfully",
                 tokenResponse
         );
 
@@ -38,7 +39,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(@RequestBody LogoutRequest request){
+    public ResponseEntity<ApiResponse<String>> logout(@Valid @RequestBody LogoutRequest request){
         authService.logout(request);
 
         ApiResponse<String> response = new ApiResponse<>(
